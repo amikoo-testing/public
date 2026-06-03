@@ -1,0 +1,53 @@
+name: Playwright Tests
+
+on:
+  workflow_dispatch:
+
+# 1. ADD THIS: Allows the workflow to publish the report website to gh-pages
+permissions:
+  contents: write
+
+jobs:
+  test:
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    # Run the job inside the official Playwright Docker container
+    container:
+      image: mcr.microsoft.com/playwright:v1.59.0-noble # Match this to your package.json playwright version
+      options: --user root
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    # Node.js is pre-installed in the image, but this ensures the correct version context
+    - uses: actions/setup-node@v4
+      with:
+        node-version: lts/*
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    # NOTICE: The "Install Playwright Browsers" step is completely gone!
+      
+    # We add the CI=true env variable so Playwright knows it's running headless in CI
+    - name: Run Playwright tests
+      env:
+        CI: true 
+        PLAYWRIGHT_JSON_OUTPUT_NAME: playwright-report/results.json
+      run: npx playwright test --project=chromium
+
+    - name: Upload Playwright Report
+      id: artifact-upload
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 30
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v4
+      if: ${{ !cancelled() }}
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./playwright-report
