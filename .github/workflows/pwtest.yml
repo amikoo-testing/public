@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     # Run the job inside the official Playwright Docker container
     container:
-      image: mcr.microsoft.com/playwright:v1.59.0-noble # Match this to your package.json playwright version
+      image: mcr.microsoft.com/playwright:v1.60.0-noble # Match this to your package.json playwright version
       options: --user root
 
     steps:
