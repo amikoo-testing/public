@@ -3,9 +3,11 @@ name: Playwright Tests
 on:
   workflow_dispatch:
 
-# 1. ADD THIS: Allows the workflow to publish the report website to gh-pages
+# Permissions needed for GitHub Pages deployment and repository checkout
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
   test:
